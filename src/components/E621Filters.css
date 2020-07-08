@@ -1,0 +1,14 @@
+
+.form {
+	width: 400px;
+	margin: 60px auto 0 auto;
+}
+.form h2  {
+  display: none;
+}
+.form input, .form button, .form select {
+	width: 400px;
+	height: 30px;
+	margin: 20px auto 0 auto;
+	box-sizing: border-box;
+}

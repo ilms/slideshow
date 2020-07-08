@@ -1,0 +1,77 @@
+.slide-wrapper {
+	width: 100vw;
+	height: 100vh;
+}
+.slide, .slide-controls {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+}
+.slide-controls {
+  animation: fadeout 2s linear forwards;
+  -webkit-animation: fadeout 2s linear forwards;
+}
+@keyframes fadeout {
+  0%,60% {opacity: 1; }
+  100% {opacity: 0; }
+}
+.current-image {
+	position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+	display: block;
+	margin: auto;
+	text-align: center;
+	border: 0px;
+	max-width: 100%;
+	max-height: 100%;
+}
+.source-button:active, .source-button:focus {
+  outline: 0;
+  border: none;
+  outline-style: none;
+  -moz-outline-style: none;
+}
+.prev-button, .next-button, .escape-button, .source-button {
+	display: block;
+	border: solid #dddddd;
+	border-width: 2px;
+	border-color: #dddddd;
+	float: left;
+	font-size: 30px;
+	color: #dddddd;
+	text-shadow: 0 0 4px #000000;
+	background-color: Transparent;
+}
+.prev-button {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 30%;
+	height: 100%;
+}
+.escape-button {
+	position: absolute;
+	top: 0;
+	left: 30%;
+	width: 40%;
+	height: 50%;
+}
+.next-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 30%;
+	height: 100%;
+}
+.source-button {
+	position: absolute;
+	bottom: 0;
+	left: 30%;
+	width: 40%;
+	height: 50%;
+	line-height: 47vh;
+	text-align: center;
+	box-sizing: border-box;
+}
