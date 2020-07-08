@@ -7,3 +7,6 @@ div {
 body {
 	background: #111111;
 }
+html {
+	touch-action: pan-x pan-y pinch-zoom;
+}
