@@ -10,6 +10,7 @@ class E621Filters extends React.Component {
     super(props);
     this.handleTagsChange = this.handleTagsChange.bind(this);
     this.search = this.search.bind(this);
+    // TODO fix fields not filling with old data
     this.state = {tags: ''};
   }
 
