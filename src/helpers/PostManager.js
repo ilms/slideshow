@@ -3,22 +3,23 @@ export class PostManager {
     this.fetcher = fetcher;
     this.posts = {};
     this.order = [];
-    this.currentIndex = 0;
+    this.currentIndex = null;
     // TODO manage extensions per platform
     // e621Extensions = new Set(['png','jpg','gif'])
     // faExtensions = new Set(['png','jpg','jpeg','gif','bmp'])
-    this.validExtensions = new Set(['png','jpg','jpeg','gif','bmp']);
+    this.validExtensions = new Set(['png','jpg','gif','webm']);
   }
 
   empty() {
     this.posts = {};
     this.order = [];
-    this.currentIndex = 0;
+    this.currentIndex = null;
   }
 
   fetchIfApplicable(callback) {
     if (this.fetcher.finished === false &&
-        this.order.length - this.currentIndex < 20) {
+        (this.currentIndex === null ||
+         this.order.length - this.currentIndex < 20)) {
       this.fetcher.fetch(this.fetchCallback.bind(this, callback));
     }
   }
@@ -37,7 +38,7 @@ export class PostManager {
   }
 
   isPostAllowed(post) {
-    return this.validExtensions.has(post.extension);
+    return this.validExtensions.has(post.fileExtension);
   }
 
   addPosts(posts) {
@@ -59,27 +60,31 @@ export class PostManager {
   }
 
   next() {
-    this.currentIndex++;
-    var postCount = this.order.length
-    if (this.currentIndex >= postCount){
-      if (postCount > 0) {
-        this.currentIndex = postCount - 1;
-      } else {
-        this.currentIndex = 0;
+    if (this.currentIndex !== null) {
+      this.currentIndex++;
+      var postCount = this.order.length
+      if (this.currentIndex >= postCount){
+        if (postCount > 0) {
+          this.currentIndex = postCount - 1;
+        } else {
+          this.currentIndex = 0;
+        }
+        return false;
       }
-      return false;
+      this.fetchIfApplicable();
+      return true;
     }
-    this.fetchIfApplicable();
-    return true;
   }
 
   prev() {
-    this.currentIndex--;
-    if (this.currentIndex < 0){
-      this.currentIndex = 0;
-      return false;
+    if (this.currentIndex !== null) {
+      this.currentIndex--;
+      if (this.currentIndex < 0){
+        this.currentIndex = 0;
+        return false;
+      }
+      return true;
     }
-    return true;
   }
 
   getPostById(id) {
@@ -90,22 +95,32 @@ export class PostManager {
     return this.posts[this.order[index]];
   }
 
+  getAllPosts() {
+    let allPosts = [];
+    for (let i = 0; i < this.order.length; i++) {
+      allPosts.push(this.posts[this.order[i]]);
+    }
+    return allPosts;
+  }
+
   getCurrentPost() {
-    return this.getPostByIndex(this.currentIndex);
+    return this.currentIndex !== null ? this.getPostByIndex(this.currentIndex) : null;
   }
 
   getCachePosts(preload, postload) {
-    let minimum = this.currentIndex - postload;
-    let maximum = this.currentIndex + preload;
-    if (minimum < 0) {
-        minimum = 0;
-    }
-    if (maximum >= this.order.length) {
-        maximum = this.order.length - 1;
-    }
     let posts = [];
-    for (let i = minimum; i <= maximum; i++) {
-        posts.push(this.getPostByIndex(i));
+    if (this.currentIndex !== null) {
+      let minimum = this.currentIndex - postload;
+      let maximum = this.currentIndex + preload;
+      if (minimum < 0) {
+          minimum = 0;
+      }
+      if (maximum >= this.order.length) {
+          maximum = this.order.length - 1;
+      }
+      for (let i = minimum; i <= maximum; i++) {
+          posts.push(this.getPostByIndex(i));
+      }
     }
     return posts;
   }
