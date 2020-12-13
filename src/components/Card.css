@@ -1,0 +1,12 @@
+.card {
+  height: 160px;
+  width: 160px;
+}
+
+.card button {
+  height: 100%;
+  width: 100%;
+  border: none;
+  padding: 0;
+  background-color: transparent;
+}
