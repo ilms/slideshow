@@ -13,7 +13,9 @@ export class ImageCache extends React.Component {
   getImages(posts) {
     let images = [];
     for (let i = 0; i < posts.length; i++) {
-      images.push(<img src={posts[i].contentURL} alt="" />)
+      images.push(<img key={posts[i].id} alt=""
+        src={posts[i].fileExtension === 'webm' ? 
+              posts[i].sampleURL : posts[i].fileURL}/>)
     }
     return images;
   }
