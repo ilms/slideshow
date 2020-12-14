@@ -19,7 +19,7 @@ export default class E621API {
     // TODO switch to HTTP Basic Auth when possible
     return {
       _client: USER_AGENT,
-      ...Authentication.authHeaders,
+      ...Authentication.authParameters,
     };
   }
 
@@ -85,12 +85,30 @@ export default class E621API {
       'post_ids[]': post_id,
     };
     $.ajax({
-      type: 'GET',
+      type: 'POST',
       url: 'https://e621.net/post_sets/' + set_id + '/add_posts.json',
       data: {
         ...params,
         ...E621API._getURLAddons(),
       },
+      success: success,
+      failure: failure,
+    });
+  }
+
+  static async getUser({
+    user,
+    success=()=>{}, 
+    failure=()=>{},
+  }={}) {
+    if (!user) {
+      setTimeout(() => { failure(); }, 0);
+      return;
+    }
+    $.ajax({
+      type: 'GET',
+      url: 'https://e621.net/users/' + user + '.json',
+      data: E621API._getURLAddons(),
       success: success,
       failure: failure,
     });
