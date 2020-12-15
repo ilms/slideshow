@@ -1,6 +1,8 @@
 .card {
-  height: 160px;
-  width: 160px;
+  display: block;
+  position: relative;
+  height: 150px;
+  width: 150px;
 }
 
 .card button {
@@ -9,4 +11,26 @@
   border: none;
   padding: 0;
   background-color: transparent;
+}
+
+.card img {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.card.content-type-webm button::before {
+	background-color: #1f3c67;
+	border: 1px solid #fff;
+	color: #fff;
+	z-index: 5;
+	position: absolute;
+	left: 0;
+	top: 8px;
+	text-align: center;
+	border-radius: 6px;
+  padding: 3px 5px;
+  line-height: 17px;
+	font-size: 60%;
+	font-weight: 700;
+	content: "WEBM";
 }
