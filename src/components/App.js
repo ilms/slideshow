@@ -23,6 +23,7 @@ class App extends React.Component {
     this.slideshowPrev = this.slideshowPrev.bind(this);
     this.keydownHandler = this.keydownHandler.bind(this);
     this.openSearch = this.openSearch.bind(this);
+    this.openSettings = this.openSettings.bind(this);
     this.galleryViewPost = this.galleryViewPost.bind(this);
     this.addToSet = this.addToSet.bind(this);
     this.onSettingsChange = this.onSettingsChange.bind(this);
@@ -54,10 +55,12 @@ class App extends React.Component {
         <div className={this.state.mode === 'gallery' ? 'mount show' : 'mount'}>
           <Gallery postManager={this.state.postManager}
                    openSearch={this.openSearch}
+                   openSettings={this.openSettings}
                    viewPost={this.galleryViewPost} />
         </div>
         <div className={this.state.mode === 'settings' ? 'mount show' : 'mount'}>
-          <E621Settings onSettingsChange={this.onSettingsChange} />
+          <E621Settings close={this.openGallery} 
+                        onSettingsChange={this.onSettingsChange} />
         </div>
         <ImageCache posts={this.state.currentCache} />
       </>
@@ -92,7 +95,7 @@ class App extends React.Component {
 
   search(filters) {
     // TODO pass proper settings
-    let settings = {limit: 50};
+    let settings = {limit: 60};
     let postManager = new PostManager(new E621Searcher(filters.tags, settings.limit));
     postManager.fetchIfApplicable(this.searchCallback);
     this.setState({
@@ -129,6 +132,12 @@ class App extends React.Component {
   openGallery() {
     this.setState({
       mode: 'gallery',
+    });
+  }
+
+  openSettings() {
+    this.setState({
+      mode: 'settings',
     });
   }
 
