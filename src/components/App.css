@@ -2,6 +2,13 @@ html {
   user-select: none;
 }
 
+body {
+  color: #fff;
+  font-family: Verdana,sans-serif;
+  font-size: 85%;
+  line-height: 1.25em;
+}
+
 .mount {
   position: fixed;
   height: 100vh;
