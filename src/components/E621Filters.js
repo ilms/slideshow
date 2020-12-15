@@ -9,6 +9,7 @@ class E621Filters extends React.Component {
   constructor(props) {
     super(props);
     this.handleTagsChange = this.handleTagsChange.bind(this);
+    this.handleTagsKey = this.handleTagsKey.bind(this);
     this.search = this.search.bind(this);
     // TODO fix fields not filling with old data
     this.state = {tags: ''};
@@ -16,8 +17,10 @@ class E621Filters extends React.Component {
 
   render() {
     return (
-      <div className="form">
-        <Field label="Tags" type="text" onChange={this.handleTagsChange} onKeyPress={this.handleTagsKey} />
+      <div className="form filter-form">
+        <Field label="Tags" type="text" 
+               onChange={this.handleTagsChange} 
+               onKeyPress={this.handleTagsKey} />
         <button onClick={this.search}>
           Search
         </button>
@@ -34,6 +37,7 @@ class E621Filters extends React.Component {
 
   handleTagsKey(e) {
     if (e.key === 'Enter') {
+      e.target.blur();
       this.search();
     }
   }
