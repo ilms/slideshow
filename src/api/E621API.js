@@ -77,13 +77,14 @@ export default class E621API {
     success=()=>{}, 
     failure=()=>{},
   }={}) {
-    if (post_id === null || set_id === null) {
+    if (post_id === null || set_id === null || set_id === '') {
       setTimeout(() => { failure(); }, 0);
       return;
     }
     let params = {
       'post_ids[]': post_id,
     };
+    // TODO add better error handling, i.e. message of issue
     $.ajax({
       type: 'POST',
       url: 'https://e621.net/post_sets/' + set_id + '/add_posts.json',
@@ -93,6 +94,7 @@ export default class E621API {
       },
       success: success,
       failure: failure,
+      error: failure,
     });
   }
 
@@ -111,6 +113,21 @@ export default class E621API {
       data: E621API._getURLAddons(),
       success: success,
       failure: failure,
+    });
+  }
+
+  // TODO write documention - gets sets available to user (owned + managed)
+  static async getSets({
+    success=()=>{}, 
+    failure=()=>{},
+  }={}) {
+    $.ajax({
+      type: 'GET',
+      url: 'https://e621.net/post_sets/for_select.json',
+      data: E621API._getURLAddons(),
+      success: success,
+      failure: failure,
+      error: failure,
     });
   }
 }

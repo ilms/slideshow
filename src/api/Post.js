@@ -282,14 +282,14 @@ export default class Post {
    */
   get tags() {
     return [
-      ...this.tagsInGroup('artist'),
-      ...this.tagsInGroup('copyright'),
-      ...this.tagsInGroup('character'),
-      ...this.tagsInGroup('species'),
-      ...this.tagsInGroup('general'),
-      ...this.tagsInGroup('meta'),
-      ...this.tagsInGroup('lore'),
-      ...this.tagsInGroup('invalid'),
+      ...this.getTagsInGroup('artist'),
+      ...this.getTagsInGroup('copyright'),
+      ...this.getTagsInGroup('character'),
+      ...this.getTagsInGroup('species'),
+      ...this.getTagsInGroup('general'),
+      ...this.getTagsInGroup('meta'),
+      ...this.getTagsInGroup('lore'),
+      ...this.getTagsInGroup('invalid'),
     ];
   }
 

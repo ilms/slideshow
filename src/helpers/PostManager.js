@@ -1,9 +1,18 @@
+import BlacklistFilter from '../api/filters/BlacklistFilter';
+
+
 export class PostManager {
-  constructor(fetcher) {
+  constructor(fetcher, blacklist) {
     this.fetcher = fetcher;
     this.posts = {};
     this.order = [];
-    this.currentIndex = null;
+    this.pages = [];
+    this.pageLocations = {};
+    this.currentPostIndex = null;
+    this.currentPageIndex = null;
+    this.blacklistFilter = new BlacklistFilter(blacklist);
+    this.lookahead = false; // PostManager will automatically get pages
+    this.maxLookahead = 2000; // Max posts grabbed automatically before stopping
     // TODO manage extensions per platform
     // e621Extensions = new Set(['png','jpg','gif'])
     // faExtensions = new Set(['png','jpg','jpeg','gif','bmp'])
@@ -13,74 +22,115 @@ export class PostManager {
   empty() {
     this.posts = {};
     this.order = [];
-    this.currentIndex = null;
+    this.pages = [];
+    this.pageLocations = {};
+    this.currentPostIndex = null;
+    this.currentPageIndex = null;
   }
 
-  fetchIfApplicable(callback) {
-    if (this.fetcher.finished === false &&
-        (this.currentIndex === null ||
-         this.order.length - this.currentIndex < 20)) {
-      this.fetcher.fetch(this.fetchCallback.bind(this, callback));
+  /**
+   * Starts searching for posts.
+   * 
+   * @param {CallableFunction} callback 
+   *               Called with true when posts were found, false otherwise.
+   *               This can return true while no posts are present if they 
+   *               are all blacklisted or flash files. 
+   */
+  start(callback = () => {}) {
+    this._fetch(callback);
+  }
+
+  /**
+   * Fetches the next page of posts
+   * 
+   * @param {CallableFunction} callback 
+   *               Called with true when posts were found, false otherwise.
+   *               This can return true while no posts are present if they 
+   *               are all blacklisted or flash files. 
+   */
+  _fetch(callback = () => {}) {
+    if (this.fetcher.finished === false) {
+      this.fetcher.fetch(this._fetchCallback.bind(this, callback));
     }
   }
 
-  fetchCallback(callback, posts) {
+  _fetchIfNeeded() {
+    if (this.currentPostIndex === null) return;
+    if (this.currentPostIndex >= this.order.length - 20) {
+      // || this.currentPageIndex >= this.pages.length - 1) {
+      this._fetch();
+    }
+  }
+
+  _fetchCallback(callback, posts) {
     if (posts.length === 0) {
       if (callback) {
         callback(false);
       }
     } else {
-      this.addPosts(posts);
+      this._addPosts(posts);
       if (callback) {
         callback(true);
       }
-    }
-  }
-
-  isPostAllowed(post) {
-    return this.validExtensions.has(post.fileExtension);
-  }
-
-  addPosts(posts) {
-    for (let i = 0; i < posts.length; i++) {
-      let post = posts[i];
-      if (this.isPostAllowed(post)) {
-        this.posts[post.id] = post;
-        this.order.push(post.id);
+      if (this.lookahead) {
+        if (this.order.length < this.maxLookahead) {
+          this._fetch();
+        }
       }
     }
+  }
+
+  _isPostAllowed(post) {
+    if (!this.validExtensions.has(post.fileExtension)) return false;
+    if (!this.blacklistFilter.approve(post)) return false;
+    return true;
+  }
+
+  _addPosts(posts) {
+    let page = [];
+    let pageIndex = this.pages.length;
+    for (let i = 0; i < posts.length; i++) {
+      let post = posts[i];
+      if (this._isPostAllowed(post)) {
+        this.posts[post.id] = post;
+        this.order.push(post.id);
+        page.push(post.id);
+        this.pageLocations[post.id] = pageIndex;
+      }
+    }
+    this.pages.push(page);
   }
 
   moveToStart() {
-    this.currentIndex = 0;
+    this.currentPostIndex = 0;
   }
 
   moveTo(index) {
-    this.currentIndex = index;
+    this.currentPostIndex = index;
   }
 
   next() {
-    if (this.currentIndex !== null) {
-      this.currentIndex++;
+    if (this.currentPostIndex !== null) {
+      this.currentPostIndex++;
       var postCount = this.order.length
-      if (this.currentIndex >= postCount){
+      if (this.currentPostIndex >= postCount){
         if (postCount > 0) {
-          this.currentIndex = postCount - 1;
+          this.currentPostIndex = postCount - 1;
         } else {
-          this.currentIndex = 0;
+          this.currentPostIndex = 0;
         }
         return false;
       }
-      this.fetchIfApplicable();
+      this._fetchIfNeeded();
       return true;
     }
   }
 
   prev() {
-    if (this.currentIndex !== null) {
-      this.currentIndex--;
-      if (this.currentIndex < 0){
-        this.currentIndex = 0;
+    if (this.currentPostIndex !== null) {
+      this.currentPostIndex--;
+      if (this.currentPostIndex < 0){
+        this.currentPostIndex = 0;
         return false;
       }
       return true;
@@ -104,14 +154,14 @@ export class PostManager {
   }
 
   getCurrentPost() {
-    return this.currentIndex !== null ? this.getPostByIndex(this.currentIndex) : null;
+    return this.currentPostIndex !== null ? this.getPostByIndex(this.currentPostIndex) : null;
   }
 
   getCachePosts(preload, postload) {
     let posts = [];
-    if (this.currentIndex !== null) {
-      let minimum = this.currentIndex - postload;
-      let maximum = this.currentIndex + preload;
+    if (this.currentPostIndex !== null) {
+      let minimum = this.currentPostIndex - postload;
+      let maximum = this.currentPostIndex + preload;
       if (minimum < 0) {
           minimum = 0;
       }

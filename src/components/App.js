@@ -30,7 +30,7 @@ class App extends React.Component {
     this.state = {
       mode: 'search',
       api: 'e621',
-      settings: {},
+      settings: E621Settings.initialState,
       currentCache: [],
       slideshowPost: null,
       posts: [],
@@ -95,9 +95,12 @@ class App extends React.Component {
 
   search(filters) {
     // TODO pass proper settings
-    let settings = {limit: 60};
-    let postManager = new PostManager(new E621Searcher(filters.tags, settings.limit));
-    postManager.fetchIfApplicable(this.searchCallback);
+    let settings = {limit: 30};
+    let postManager = new PostManager(
+      new E621Searcher(filters.tags, settings.limit),
+      this.state.settings.userBlacklist,
+    );
+    postManager.start(this.searchCallback);
     this.setState({
       mode: 'gallery',
       postManager: postManager,
@@ -159,11 +162,16 @@ class App extends React.Component {
     });
   }
 
-  addToSet() {
+  addToSet({
+    success=()=>{}, 
+    failure=()=>{},
+  }={}) {
     let post = this.state.postManager.getCurrentPost();
     E621API.addPostToSet({
       post_id: post.id,
-      set_id: this.settings.setID
+      set_id: this.state.settings.setID,
+      success: success,
+      failure: failure,
     });
   }
 

@@ -11,7 +11,7 @@ export default class E621Searcher {
 
   constructor(tags) {
     this.tags = tags;
-    this.limit = 50;
+    this.limit = 100;
     this._page = 1;
     this._fetching = false;
     this._finished = false;
@@ -29,7 +29,7 @@ export default class E621Searcher {
         tags: this.tags,
         page: this._page,
         limit: this.limit,
-        success: this.fetchSuccess.bind(this, callback),
+        success: this._fetchSuccess.bind(this, callback),
       }
       E621Searcher.queue.add(function() {
         E621API.getPosts(request);
@@ -39,7 +39,7 @@ export default class E621Searcher {
     }
   }
 
-  fetchSuccess(callback, data) {
+  _fetchSuccess(callback, data) {
     this._fetching = false;
     if (data['posts'].length === 0) {
       this._finished = true;

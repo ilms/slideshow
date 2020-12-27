@@ -10,7 +10,7 @@ body {
 }
 
 .mount {
-  position: fixed;
+  position: absolute;
   height: 100vh;
   width: 100vw;
   overflow: hidden;

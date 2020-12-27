@@ -5,6 +5,16 @@ import missing from '../missing.png';
 
 
 export class Slideshow extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      removeSetText: '➖',
+      addSetText: '➕',
+    }
+    this.removeFromSet = this.removeFromSet.bind(this);
+    this.addToSet = this.addToSet.bind(this);
+  }
+
   render() {
     let wrapperClassName = 'slide-wrapper';
     if (this.props.post) {
@@ -22,8 +32,43 @@ export class Slideshow extends React.Component {
              target="_blank" rel="noopener noreferrer">Link</a>
           <button className="next-button" onClick={this.props.next}>Next</button>
         </div>
+        <div className="slide-controls-extra">
+          <button className="add-set-button" onClick={this.addToSet}>
+            {this.state.addSetText}
+          </button>
+        </div>
       </div>
     );
+  }
+
+  componentDidMount() {
+    this.onNewPost();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.post !== this.props.post) {
+      this.onNewPost();
+    }
+  }
+
+  onNewPost() {
+    this.setState({
+      removeSetText: '➖',
+      addSetText: '➕',
+    });
+  }
+
+  removeFromSet() {
+    // TODO
+  }
+
+  addToSet() {
+    let setState = this.setState.bind(this);
+    setState({addSetText: '🔄'});
+    this.props.addToSet({
+      success: () => { setState({addSetText: '✔️'}); }, 
+      failure: () => { setState({addSetText: '❌'}); }, 
+    });
   }
 
   getSlideContents() {
