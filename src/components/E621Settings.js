@@ -61,6 +61,17 @@ class E621Settings extends React.Component {
     );
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    // Because React does not auto update on select option changes
+    if (prevState.sets !== this.state.sets) {
+      // Select the first element of the available sets
+      let owned = this.state.sets['Owned'];
+      let maintained = this.state.sets['Maintained'];
+      let setID = owned.concat(maintained)[0][1];
+      this.setState({setID: setID});
+    }
+  }
+
   handleLocalChange(event) {
     let target = event.target;
     let value = target.type === 'checkbox' ? target.checked : target.value;
