@@ -67,8 +67,12 @@ class E621Settings extends React.Component {
       // Select the first element of the available sets
       let owned = this.state.sets['Owned'];
       let maintained = this.state.sets['Maintained'];
-      let setID = owned.concat(maintained)[0][1];
-      this.setState({setID: setID});
+      let allSets = owned.concat(maintained);
+      if (allSets.length > 0) {
+        this.setState({setID: allSets[0][1]});
+      } else {
+        this.setState({setID: ""});
+      }
     }
   }
 
